@@ -22,10 +22,17 @@ jobs:
         run: |
           set +e
           mkdir -p build
+          SIMULATOR_UDID="$(xcrun simctl list devices available -j | python3 -c 'import json, sys; data=json.load(sys.stdin); phones=[device for devices in data["devices"].values() for device in devices if device.get("isAvailable") and device.get("name", "").startswith("iPhone")]; print(phones[0]["udid"] if phones else "")')"
+          if [ -z "$SIMULATOR_UDID" ]; then
+            echo "::error::No available iPhone simulator found"
+            xcrun simctl list devices available
+            exit 70
+          fi
+          echo "Using simulator $SIMULATOR_UDID"
           xcodebuild test \
             -project MP3Build.xcodeproj \
             -scheme MP3Build \
-            -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
             -resultBundlePath build/TestResults.xcresult 2>&1 | tee build/xcode-test.log
           status=${PIPESTATUS[0]}
           if [ "$status" -ne 0 ]; then
