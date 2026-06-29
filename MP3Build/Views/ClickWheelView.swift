@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct ClickWheelView: View {
     @Environment(\.playerTheme) private var theme
@@ -9,13 +8,10 @@ struct ClickWheelView: View {
     var onSelect: () -> Void
     var onPrevious: () -> Void
     var onNext: () -> Void
-    var onPreviousLong: () -> Void
-    var onNextLong: () -> Void
     var onPlayPause: () -> Void
 
-    @State private var engine = ClickWheelEngine()
+    @State private var lastAngle: Angle?
     @State private var pressedLabel: String?
-    private let haptic = UISelectionFeedbackGenerator()
 
     var body: some View {
         ZStack {
@@ -40,8 +36,8 @@ struct ClickWheelView: View {
                 .gesture(rotationGesture)
 
             wheelButton("BACK", offset: CGSize(width: 0, height: -76), action: onMenu, boxed: false)
-            wheelButton("<<", offset: CGSize(width: -78, height: 0), action: onPrevious, longAction: onPreviousLong, boxed: true)
-            wheelButton(">>", offset: CGSize(width: 78, height: 0), action: onNext, longAction: onNextLong, boxed: true)
+            wheelButton("<<", offset: CGSize(width: -78, height: 0), action: onPrevious, boxed: true)
+            wheelButton(">>", offset: CGSize(width: 78, height: 0), action: onNext, boxed: true)
             wheelButton(">II", offset: CGSize(width: 0, height: 78), action: onPlayPause, boxed: true)
 
             Button(action: onSelect) {
@@ -62,28 +58,13 @@ struct ClickWheelView: View {
                     .shadow(color: .black.opacity(0.14), radius: 7, y: 4)
             }
             .buttonStyle(.plain)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in pressedLabel = "SELECT" }
-                    .onEnded { _ in pressedLabel = nil }
-            )
         }
         .frame(width: 220, height: 220)
-        .onAppear {
-            haptic.prepare()
-        }
     }
 
-    private func wheelButton(
-        _ label: String,
-        offset: CGSize,
-        action: @escaping () -> Void,
-        longAction: (() -> Void)? = nil,
-        boxed: Bool
-    ) -> some View {
+    private func wheelButton(_ label: String, offset: CGSize, action: @escaping () -> Void, boxed: Bool) -> some View {
         Button {
             action()
-            haptic.selectionChanged()
             pressedLabel = label
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 pressedLabel = nil
@@ -108,13 +89,6 @@ struct ClickWheelView: View {
                 }
         }
         .buttonStyle(.plain)
-        .simultaneousGesture(
-            LongPressGesture(minimumDuration: 0.45)
-                .onEnded { _ in
-                    longAction?()
-                    haptic.selectionChanged()
-                }
-        )
         .offset(offset)
     }
 
@@ -125,14 +99,22 @@ struct ClickWheelView: View {
                 let vector = CGVector(dx: value.location.x - center.x, dy: value.location.y - center.y)
                 let angle = Angle(radians: atan2(vector.dy, vector.dx))
 
-                let steps = engine.update(angleDegrees: angle.degrees)
-                if steps != 0 {
-                    onRotate(steps)
-                    haptic.selectionChanged()
+                guard let lastAngle else {
+                    self.lastAngle = angle
+                    return
+                }
+
+                var delta = angle.degrees - lastAngle.degrees
+                if delta > 180 { delta -= 360 }
+                if delta < -180 { delta += 360 }
+
+                if abs(delta) > 18 {
+                    onRotate(delta > 0 ? 1 : -1)
+                    self.lastAngle = angle
                 }
             }
             .onEnded { _ in
-                engine.reset()
+                lastAngle = nil
             }
     }
 }

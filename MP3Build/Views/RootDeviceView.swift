@@ -44,10 +44,8 @@ struct RootDeviceView: View {
                     onRotate: navigation.moveSelection,
                     onMenu: navigation.back,
                     onSelect: navigation.select,
-                    onPrevious: { playback.seek(by: -10) },
-                    onNext: { playback.seek(by: 10) },
-                    onPreviousLong: { playback.seek(by: -30) },
-                    onNextLong: { playback.seek(by: 30) },
+                    onPrevious: {},
+                    onNext: {},
                     onPlayPause: playback.togglePlayPause
                 )
                 .environment(\.playerTheme, theme)
