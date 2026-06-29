@@ -29,15 +29,16 @@ jobs:
             exit 70
           fi
           echo "Using simulator $SIMULATOR_UDID"
+          xcrun simctl boot "$SIMULATOR_UDID" || true
           xcodebuild test \
             -project MP3Build.xcodeproj \
             -scheme MP3Build \
-            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+            -destination "id=$SIMULATOR_UDID" \
             -resultBundlePath build/TestResults.xcresult 2>&1 | tee build/xcode-test.log
           status=${PIPESTATUS[0]}
           if [ "$status" -ne 0 ]; then
             echo "::error::xcodebuild test failed with exit code $status"
-            grep -i -E "error:|cannot |failed|SettingsView|SwiftCompile|CompileSwift" build/xcode-test.log | tail -160 | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g' | while IFS= read -r line; do
+            grep -i -E "Using simulator|error:|cannot |failed|SettingsView|SwiftCompile|CompileSwift|destination" build/xcode-test.log | tail -160 | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g' | while IFS= read -r line; do
               echo "::error::$line"
             done
           fi
