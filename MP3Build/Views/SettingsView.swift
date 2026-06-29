@@ -6,16 +6,17 @@ struct SettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Theme")
-                .font(.system(size: 22, weight: .heavy, design: .rounded))
+                .font(theme.screenFont(size: 22, weight: .bold))
                 .foregroundColor(theme.primaryText)
             Text(theme.name)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(theme.screenFont(size: 18, weight: .bold))
                 .foregroundColor(theme.focus)
             Text("Local files only")
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .font(theme.screenFont(size: 16, weight: .bold))
                 .foregroundColor(theme.secondaryText)
             Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .shadow(color: .black, radius: 1, x: 1, y: 1)
     }
 }

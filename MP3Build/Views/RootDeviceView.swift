@@ -5,30 +5,40 @@ struct RootDeviceView: View {
     @StateObject private var playback = PlaybackController()
     @StateObject private var navigation = PlayerNavigationModel()
 
-    private let theme = PlayerTheme.sunburstClassic
+    private let theme = PlayerTheme.defaultTheme
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [theme.bodyTop, theme.bodyBottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            Color.black.ignoresSafeArea()
 
             RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .stroke(theme.bodyEdge.opacity(0.28), lineWidth: 8)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 10)
+                .fill(
+                    LinearGradient(
+                        colors: [theme.bodyTop, theme.bodyBottom],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .overlay(alignment: .top) {
+                    RoundedRectangle(cornerRadius: 34, style: .continuous)
+                        .stroke(Color.white.opacity(0.72), lineWidth: 4)
+                }
+                .overlay {
+                    RoundedRectangle(cornerRadius: 34, style: .continuous)
+                        .stroke(theme.bodyEdge.opacity(0.36), lineWidth: 2)
+                }
+                .shadow(color: .black.opacity(0.42), radius: 22, y: 12)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 54)
 
-            VStack(spacing: 22) {
+            VStack(spacing: 18) {
                 DeviceScreenView()
                     .environmentObject(library)
                     .environmentObject(playback)
                     .environmentObject(navigation)
                     .environment(\.playerTheme, theme)
                     .frame(maxWidth: 340)
-                    .frame(height: 218)
+                    .frame(height: 210)
 
                 ClickWheelView(
                     onRotate: navigation.moveSelection,
@@ -41,7 +51,7 @@ struct RootDeviceView: View {
                 .environment(\.playerTheme, theme)
             }
             .padding(.horizontal, 24)
-            .padding(.vertical, 34)
+            .padding(.vertical, 64)
         }
     }
 }

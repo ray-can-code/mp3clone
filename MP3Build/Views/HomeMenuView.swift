@@ -5,8 +5,8 @@ struct HomeMenuView: View {
     @EnvironmentObject private var navigation: PlayerNavigationModel
 
     var body: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 8) {
+        HStack(alignment: .center, spacing: 8) {
+            VStack(alignment: .leading, spacing: 0) {
                 ForEach(Array(navigation.homeEntries.enumerated()), id: \.offset) { index, entry in
                     FocusRow(
                         title: entry.title,
@@ -14,22 +14,31 @@ struct HomeMenuView: View {
                     )
                 }
             }
+            .frame(width: 150, alignment: .leading)
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 2)
 
-            ZStack {
-                Circle()
-                    .fill(.black.opacity(0.38))
-                    .frame(width: 88, height: 88)
-                Circle()
-                    .stroke(theme.focus.opacity(0.72), lineWidth: 5)
-                    .frame(width: 66, height: 66)
-                Text("MP4")
-                    .font(.system(size: 20, weight: .heavy, design: .rounded))
-                    .foregroundColor(theme.focus)
+            if let iconName = selectedIconName {
+                Image(iconName)
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+                    .frame(width: 112, height: 112)
+                    .shadow(color: .black.opacity(0.45), radius: 5, y: 4)
+                    .transition(.opacity.combined(with: .scale(scale: 0.92)))
+                    .id(iconName)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .animation(.easeOut(duration: 0.16), value: navigation.selectedHomeIndex)
+    }
+
+    private var selectedIconName: String? {
+        guard navigation.homeEntries.indices.contains(navigation.selectedHomeIndex) else {
+            return nil
+        }
+
+        return theme.homeIconName(for: navigation.homeEntries[navigation.selectedHomeIndex].screen)
     }
 }
 
@@ -39,24 +48,39 @@ private struct FocusRow: View {
     var isSelected: Bool
 
     var body: some View {
-        HStack(spacing: 7) {
+        HStack(spacing: 4) {
             Text(title)
-                .font(.system(size: isSelected ? 26 : 23, weight: .bold, design: .rounded))
+                .font(theme.screenFont(size: 20, weight: .bold))
                 .lineLimit(1)
-                .minimumScaleFactor(0.72)
+                .minimumScaleFactor(0.58)
+                .shadow(color: isSelected ? .clear : .black, radius: 1, x: 1, y: 1)
+
+            Spacer(minLength: 2)
+
             if isSelected {
-                Text(">")
-                    .font(.system(size: 24, weight: .heavy, design: .rounded))
+                if let arrow = theme.selectedRowArrowImageName {
+                    Image(arrow)
+                        .resizable()
+                        .interpolation(.none)
+                        .scaledToFit()
+                        .frame(width: 9, height: 13)
+                        .padding(.trailing, 5)
+                } else {
+                    Text(">")
+                        .font(theme.screenFont(size: 17, weight: .bold))
+                }
             }
         }
-        .foregroundColor(isSelected ? theme.focus : theme.primaryText)
-        .padding(.horizontal, isSelected ? 8 : 0)
-        .padding(.vertical, isSelected ? 1 : 0)
-        .overlay(alignment: .leading) {
-            if isSelected {
-                RoundedRectangle(cornerRadius: 2)
-                    .stroke(theme.focus, lineWidth: 2)
-                    .frame(maxWidth: .infinity)
+        .foregroundColor(isSelected ? Color(red: 0.18, green: 0.18, blue: 0.18) : theme.primaryText)
+        .frame(width: 146, height: 22, alignment: .leading)
+        .padding(.horizontal, 2)
+        .background {
+            if isSelected, let selectedRowImage = theme.selectedRowImageName {
+                Image(selectedRowImage)
+                    .resizable(capInsets: EdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4), resizingMode: .stretch)
+                    .interpolation(.none)
+            } else if isSelected {
+                Rectangle().fill(theme.focus)
             }
         }
         .animation(.easeOut(duration: 0.16), value: isSelected)

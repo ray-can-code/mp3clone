@@ -25,6 +25,30 @@
 		010000000000000000000010 /* MediaItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000000000000010 /* MediaItemTests.swift */; };
 		010000000000000000000011 /* MediaLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000000000000011 /* MediaLibraryTests.swift */; };
 		010000000000000000000012 /* PlayerNavigationModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000000000000012 /* PlayerNavigationModelTests.swift */; };
+		010000000000000000000013 /* FontRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000000000000015 /* FontRegistry.swift */; };
+		010000000000000000000014 /* PlayerThemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000000000000016 /* PlayerThemeTests.swift */; };
+		011000000000000000000001 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000001 /* config.json */; };
+		011000000000000000000002 /* desk_bg001.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000002 /* desk_bg001.png */; };
+		011000000000000000000003 /* minecraft.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000003 /* minecraft.ttf */; };
+		011000000000000000000004 /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000004 /* 1.png */; };
+		011000000000000000000005 /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000005 /* 2.png */; };
+		011000000000000000000006 /* Now Playing.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000006 /* Now Playing.png */; };
+		011000000000000000000007 /* Music.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000007 /* Music.png */; };
+		011000000000000000000008 /* Videos.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000008 /* Videos.png */; };
+		011000000000000000000009 /* Audiobooks.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000009 /* Audiobooks.png */; };
+		01100000000000000000000A /* Photos.png in Resources */ = {isa = PBXBuildFile; fileRef = 02100000000000000000000A /* Photos.png */; };
+		01100000000000000000000B /* FM Radio.png in Resources */ = {isa = PBXBuildFile; fileRef = 02100000000000000000000B /* FM Radio.png */; };
+		01100000000000000000000C /* Bluetooth.png in Resources */ = {isa = PBXBuildFile; fileRef = 02100000000000000000000C /* Bluetooth.png */; };
+		01100000000000000000000D /* Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 02100000000000000000000D /* Settings.png */; };
+		01100000000000000000000E /* ebook.png in Resources */ = {isa = PBXBuildFile; fileRef = 02100000000000000000000E /* ebook.png */; };
+		01100000000000000000000F /* calculator.png in Resources */ = {isa = PBXBuildFile; fileRef = 02100000000000000000000F /* calculator.png */; };
+		011000000000000000000010 /* calendar.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000010 /* calendar.png */; };
+		011000000000000000000011 /* battery_004.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000011 /* battery_004.png */; };
+		011000000000000000000012 /* playing.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000012 /* playing.png */; };
+		011000000000000000000013 /* pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000013 /* pause.png */; };
+		011000000000000000000014 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000014 /* stop.png */; };
+		011000000000000000000015 /* headsetWithoutMic.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000015 /* headsetWithoutMic.png */; };
+		011000000000000000000016 /* blConnected.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000016 /* blConnected.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +82,30 @@
 		020000000000000000000012 /* PlayerNavigationModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNavigationModelTests.swift; sourceTree = "<group>"; };
 		020000000000000000000013 /* MP3Build.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MP3Build.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		020000000000000000000014 /* MP3BuildTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MP3BuildTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		020000000000000000000015 /* FontRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontRegistry.swift; sourceTree = "<group>"; };
+		020000000000000000000016 /* PlayerThemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerThemeTests.swift; sourceTree = "<group>"; };
+		021000000000000000000001 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
+		021000000000000000000002 /* desk_bg001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = desk_bg001.png; sourceTree = "<group>"; };
+		021000000000000000000003 /* minecraft.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = minecraft.ttf; sourceTree = "<group>"; };
+		021000000000000000000004 /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
+		021000000000000000000005 /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
+		021000000000000000000006 /* Now Playing.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Now Playing.png"; sourceTree = "<group>"; };
+		021000000000000000000007 /* Music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Music.png; sourceTree = "<group>"; };
+		021000000000000000000008 /* Videos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Videos.png; sourceTree = "<group>"; };
+		021000000000000000000009 /* Audiobooks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Audiobooks.png; sourceTree = "<group>"; };
+		02100000000000000000000A /* Photos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Photos.png; sourceTree = "<group>"; };
+		02100000000000000000000B /* FM Radio.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "FM Radio.png"; sourceTree = "<group>"; };
+		02100000000000000000000C /* Bluetooth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Bluetooth.png; sourceTree = "<group>"; };
+		02100000000000000000000D /* Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Settings.png; sourceTree = "<group>"; };
+		02100000000000000000000E /* ebook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ebook.png; sourceTree = "<group>"; };
+		02100000000000000000000F /* calculator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = calculator.png; sourceTree = "<group>"; };
+		021000000000000000000010 /* calendar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = calendar.png; sourceTree = "<group>"; };
+		021000000000000000000011 /* battery_004.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = battery_004.png; sourceTree = "<group>"; };
+		021000000000000000000012 /* playing.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = playing.png; sourceTree = "<group>"; };
+		021000000000000000000013 /* pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pause.png; sourceTree = "<group>"; };
+		021000000000000000000014 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
+		021000000000000000000015 /* headsetWithoutMic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = headsetWithoutMic.png; sourceTree = "<group>"; };
+		021000000000000000000016 /* blConnected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blConnected.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +130,7 @@
 				070000000000000000000003 /* Models */,
 				070000000000000000000004 /* Services */,
 				070000000000000000000005 /* Views */,
+				071000000000000000000001 /* Resources */,
 			);
 			path = MP3Build;
 			sourceTree = "<group>";
@@ -102,6 +151,7 @@
 				020000000000000000000005 /* MediaLibrary.swift */,
 				020000000000000000000006 /* PlaybackController.swift */,
 				020000000000000000000007 /* PlayerNavigationModel.swift */,
+				020000000000000000000015 /* FontRegistry.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -127,8 +177,54 @@
 				020000000000000000000010 /* MediaItemTests.swift */,
 				020000000000000000000011 /* MediaLibraryTests.swift */,
 				020000000000000000000012 /* PlayerNavigationModelTests.swift */,
+				020000000000000000000016 /* PlayerThemeTests.swift */,
 			);
 			path = MP3BuildTests;
+			sourceTree = "<group>";
+		};
+		071000000000000000000001 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				071000000000000000000002 /* Themes */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		071000000000000000000002 /* Themes */ = {
+			isa = PBXGroup;
+			children = (
+				071000000000000000000003 /* Minecraft */,
+			);
+			path = Themes;
+			sourceTree = "<group>";
+		};
+		071000000000000000000003 /* Minecraft */ = {
+			isa = PBXGroup;
+			children = (
+				021000000000000000000001 /* config.json */,
+				021000000000000000000002 /* desk_bg001.png */,
+				021000000000000000000003 /* minecraft.ttf */,
+				021000000000000000000004 /* 1.png */,
+				021000000000000000000005 /* 2.png */,
+				021000000000000000000006 /* Now Playing.png */,
+				021000000000000000000007 /* Music.png */,
+				021000000000000000000008 /* Videos.png */,
+				021000000000000000000009 /* Audiobooks.png */,
+				02100000000000000000000A /* Photos.png */,
+				02100000000000000000000B /* FM Radio.png */,
+				02100000000000000000000C /* Bluetooth.png */,
+				02100000000000000000000D /* Settings.png */,
+				02100000000000000000000E /* ebook.png */,
+				02100000000000000000000F /* calculator.png */,
+				021000000000000000000010 /* calendar.png */,
+				021000000000000000000011 /* battery_004.png */,
+				021000000000000000000012 /* playing.png */,
+				021000000000000000000013 /* pause.png */,
+				021000000000000000000014 /* stop.png */,
+				021000000000000000000015 /* headsetWithoutMic.png */,
+				021000000000000000000016 /* blConnected.png */,
+			);
+			path = Minecraft;
 			sourceTree = "<group>";
 		};
 		070000000000000000000007 /* Products */ = {
@@ -206,7 +302,35 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		0A0000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		0A0000000000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				011000000000000000000001 /* config.json in Resources */,
+				011000000000000000000002 /* desk_bg001.png in Resources */,
+				011000000000000000000003 /* minecraft.ttf in Resources */,
+				011000000000000000000004 /* 1.png in Resources */,
+				011000000000000000000005 /* 2.png in Resources */,
+				011000000000000000000006 /* Now Playing.png in Resources */,
+				011000000000000000000007 /* Music.png in Resources */,
+				011000000000000000000008 /* Videos.png in Resources */,
+				011000000000000000000009 /* Audiobooks.png in Resources */,
+				01100000000000000000000A /* Photos.png in Resources */,
+				01100000000000000000000B /* FM Radio.png in Resources */,
+				01100000000000000000000C /* Bluetooth.png in Resources */,
+				01100000000000000000000D /* Settings.png in Resources */,
+				01100000000000000000000E /* ebook.png in Resources */,
+				01100000000000000000000F /* calculator.png in Resources */,
+				011000000000000000000010 /* calendar.png in Resources */,
+				011000000000000000000011 /* battery_004.png in Resources */,
+				011000000000000000000012 /* playing.png in Resources */,
+				011000000000000000000013 /* pause.png in Resources */,
+				011000000000000000000014 /* stop.png in Resources */,
+				011000000000000000000015 /* headsetWithoutMic.png in Resources */,
+				011000000000000000000016 /* blConnected.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0A0000000000000000000002 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
@@ -222,6 +346,7 @@
 				010000000000000000000005 /* MediaLibrary.swift in Sources */,
 				010000000000000000000006 /* PlaybackController.swift in Sources */,
 				010000000000000000000007 /* PlayerNavigationModel.swift in Sources */,
+				010000000000000000000013 /* FontRegistry.swift in Sources */,
 				010000000000000000000008 /* RootDeviceView.swift in Sources */,
 				010000000000000000000009 /* DeviceScreenView.swift in Sources */,
 				01000000000000000000000A /* HomeMenuView.swift in Sources */,
@@ -240,6 +365,7 @@
 				010000000000000000000010 /* MediaItemTests.swift in Sources */,
 				010000000000000000000011 /* MediaLibraryTests.swift in Sources */,
 				010000000000000000000012 /* PlayerNavigationModelTests.swift in Sources */,
+				010000000000000000000014 /* PlayerThemeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

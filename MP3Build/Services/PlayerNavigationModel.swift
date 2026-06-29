@@ -16,6 +16,10 @@ final class PlayerNavigationModel: ObservableObject {
         HomeEntry(title: "Now Playing", screen: .nowPlaying),
         HomeEntry(title: "Music", screen: .music),
         HomeEntry(title: "Videos", screen: .videos),
+        HomeEntry(title: "Audiobooks", screen: .audiobooks),
+        HomeEntry(title: "Photos", screen: .photos),
+        HomeEntry(title: "FM Radio", screen: .fmRadio),
+        HomeEntry(title: "Bluetooth", screen: .bluetooth),
         HomeEntry(title: "Settings", screen: .settings)
     ]
 

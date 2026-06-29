@@ -20,4 +20,20 @@ final class PlayerNavigationModelTests: XCTestCase {
 
         XCTAssertEqual(model.currentScreen, .nowPlaying)
     }
+
+    func testHomeEntriesIncludeMinecraftThemePlaceholders() {
+        let model = PlayerNavigationModel()
+        let titles = model.homeEntries.map(\.title)
+
+        XCTAssertEqual(titles, [
+            "Now Playing",
+            "Music",
+            "Videos",
+            "Audiobooks",
+            "Photos",
+            "FM Radio",
+            "Bluetooth",
+            "Settings"
+        ])
+    }
 }

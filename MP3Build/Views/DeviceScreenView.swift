@@ -6,42 +6,59 @@ struct DeviceScreenView: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(theme.screenBackground)
-                .overlay(alignment: .topTrailing) {
-                    Circle()
-                        .fill(theme.screenGloss.opacity(0.72))
-                        .frame(width: 196, height: 196)
-                        .offset(x: 42, y: -92)
-                }
-                .overlay(alignment: .bottomLeading) {
-                    RoundedRectangle(cornerRadius: 120, style: .continuous)
-                        .fill(theme.screenGloss.opacity(0.34))
-                        .frame(width: 260, height: 90)
-                        .rotationEffect(.degrees(-24))
-                        .offset(x: -58, y: 28)
-                }
+            screenBackground
 
-            VStack(spacing: 8) {
-                HStack {
+            VStack(spacing: 4) {
+                HStack(spacing: 6) {
                     Text(title)
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(theme.screenFont(size: 20, weight: .bold))
                     Spacer()
-                    Text(statusText)
-                        .font(.system(size: 12, weight: .heavy, design: .rounded))
+                    if let batteryImageName = theme.batteryImageName {
+                        Image(batteryImageName)
+                            .resizable()
+                            .interpolation(.none)
+                            .scaledToFit()
+                            .frame(width: 27, height: 14)
+                            .accessibilityHidden(true)
+                    }
+                    Text("100%")
+                        .font(theme.screenFont(size: 15, weight: .bold))
                 }
                 .foregroundColor(theme.primaryText)
+                .shadow(color: .black, radius: 1, x: 1, y: 1)
 
                 screenBody
             }
-            .padding(16)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 7)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.black.opacity(0.50), lineWidth: 8)
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .stroke(Color.black.opacity(0.72), lineWidth: 2)
         }
         .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
+    }
+
+    @ViewBuilder
+    private var screenBackground: some View {
+        ZStack {
+            if let wallpaper = theme.screenWallpaperName {
+                Image(wallpaper)
+                    .resizable()
+                    .interpolation(.medium)
+                    .scaledToFill()
+            } else {
+                theme.screenBackground
+            }
+
+            theme.screenBackground.opacity(0.34)
+            LinearGradient(
+                colors: [.black.opacity(0.20), .clear, .black.opacity(0.36)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
     }
 
     private var title: String {
@@ -50,12 +67,12 @@ struct DeviceScreenView: View {
         case .nowPlaying: return "Now Playing"
         case .music: return "Music"
         case .videos: return "Videos"
+        case .audiobooks: return "Audiobooks"
+        case .photos: return "Photos"
+        case .fmRadio: return "FM Radio"
+        case .bluetooth: return "Bluetooth"
         case .settings: return "Settings"
         }
-    }
-
-    private var statusText: String {
-        "II  AUDIO  BAT"
     }
 
     @ViewBuilder
@@ -69,8 +86,37 @@ struct DeviceScreenView: View {
             MediaListView(kind: .audio)
         case .videos:
             MediaListView(kind: .video)
+        case .audiobooks:
+            PlaceholderFeatureView(title: "Audiobooks", subtitle: "Coming soon")
+        case .photos:
+            PlaceholderFeatureView(title: "Photos", subtitle: "Coming soon")
+        case .fmRadio:
+            PlaceholderFeatureView(title: "FM Radio", subtitle: "iPhone has no FM tuner")
+        case .bluetooth:
+            PlaceholderFeatureView(title: "Bluetooth", subtitle: "Use iOS settings")
         case .settings:
             SettingsView()
         }
+    }
+}
+
+private struct PlaceholderFeatureView: View {
+    @Environment(\.playerTheme) private var theme
+    var title: String
+    var subtitle: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Spacer()
+            Text(title)
+                .font(theme.screenFont(size: 23, weight: .bold))
+                .foregroundColor(theme.primaryText)
+            Text(subtitle)
+                .font(theme.screenFont(size: 15))
+                .foregroundColor(theme.secondaryText)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .shadow(color: .black, radius: 1, x: 1, y: 1)
     }
 }
