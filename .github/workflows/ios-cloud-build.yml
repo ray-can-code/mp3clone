@@ -20,11 +20,21 @@ jobs:
 
       - name: Run unit tests on simulator
         run: |
+          set +e
+          mkdir -p build
           xcodebuild test \
             -project MP3Build.xcodeproj \
             -scheme MP3Build \
             -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' \
-            -resultBundlePath build/TestResults.xcresult
+            -resultBundlePath build/TestResults.xcresult 2>&1 | tee build/xcode-test.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            echo "::error::xcodebuild test failed with exit code $status"
+            tail -120 build/xcode-test.log | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g' | while IFS= read -r line; do
+              echo "::error::$line"
+            done
+          fi
+          exit "$status"
 
       - name: Build unsigned device app
         run: |
@@ -56,4 +66,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MP3Build-test-results
-          path: build/TestResults.xcresult
+          path: |
+            build/TestResults.xcresult
+            build/xcode-test.log
