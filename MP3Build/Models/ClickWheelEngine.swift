@@ -7,6 +7,11 @@ struct ClickWheelEngine {
     private var lastAngleDegrees: Double?
     private var accumulatedDegrees: Double = 0
 
+    init(stepDegrees: Double = 18, maximumStepsPerUpdate: Int = 4) {
+        self.stepDegrees = stepDegrees
+        self.maximumStepsPerUpdate = maximumStepsPerUpdate
+    }
+
     mutating func update(angleDegrees: Double) -> Int {
         guard let lastAngleDegrees else {
             self.lastAngleDegrees = angleDegrees
