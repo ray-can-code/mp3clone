@@ -1,0 +1,59 @@
+name: iOS Cloud Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/local-ios-media-player
+
+jobs:
+  build:
+    name: Build MP3 Build
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Run unit tests on simulator
+        run: |
+          xcodebuild test \
+            -project MP3Build.xcodeproj \
+            -scheme MP3Build \
+            -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation)' \
+            -resultBundlePath build/TestResults.xcresult
+
+      - name: Build unsigned device app
+        run: |
+          xcodebuild build \
+            -project MP3Build.xcodeproj \
+            -scheme MP3Build \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p build/Payload
+          cp -R build/DerivedData/Build/Products/Release-iphoneos/MP3Build.app build/Payload/
+          cd build
+          zip -qry MP3Build-unsigned.ipa Payload
+
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: MP3Build-unsigned-ipa
+          path: build/MP3Build-unsigned.ipa
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MP3Build-test-results
+          path: build/TestResults.xcresult

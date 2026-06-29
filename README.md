@@ -28,3 +28,9 @@ The app does not emulate Innioasis firmware and does not use proprietary Innioas
 ## Sideloading Direction
 
 To create an IPA, archive the app in Xcode with a valid signing identity, export the archive, then install the IPA through your sideloading workflow. This repository does not include certificates, profiles, or vendor firmware.
+
+## No-Mac Build Path
+
+This repository includes a GitHub Actions workflow at `.github/workflows/ios-cloud-build.yml`. Push the repository to GitHub, open the Actions tab, run **iOS Cloud Build**, then download the `MP3Build-unsigned-ipa` artifact.
+
+The artifact is intentionally unsigned. On Windows, use Sideloadly to sign and install the IPA with your Apple ID. If that path fails, the next-best option is Codemagic with Apple code signing configured.
