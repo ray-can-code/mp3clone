@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeMenuView: View {
     @Environment(\.playerTheme) private var theme
     @EnvironmentObject private var navigation: PlayerNavigationModel
+    @State private var iconFloat = false
 
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
@@ -25,12 +26,19 @@ struct HomeMenuView: View {
                     .scaledToFit()
                     .frame(width: 112, height: 112)
                     .shadow(color: .black.opacity(0.45), radius: 5, y: 4)
+                    .offset(y: iconFloat ? -5 : 5)
+                    .rotationEffect(.degrees(iconFloat ? -2 : 2))
                     .transition(.opacity.combined(with: .scale(scale: 0.92)))
                     .id(iconName)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(.easeOut(duration: 0.16), value: navigation.selectedHomeIndex)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.25).repeatForever(autoreverses: true)) {
+                iconFloat.toggle()
+            }
+        }
     }
 
     private var selectedIconName: String? {

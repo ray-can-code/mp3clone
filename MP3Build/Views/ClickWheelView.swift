@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ClickWheelView: View {
     @Environment(\.playerTheme) private var theme
@@ -9,8 +10,11 @@ struct ClickWheelView: View {
     var onPrevious: () -> Void
     var onNext: () -> Void
     var onPlayPause: () -> Void
+    var onPreviousLong: () -> Void = {}
+    var onNextLong: () -> Void = {}
+    var onPlayPauseLong: () -> Void = {}
 
-    @State private var lastAngle: Angle?
+    @State private var engine = ClickWheelEngine(stepDegrees: 14, maximumStepsPerUpdate: 5)
     @State private var pressedLabel: String?
 
     var body: some View {
@@ -36,11 +40,14 @@ struct ClickWheelView: View {
                 .gesture(rotationGesture)
 
             wheelButton("BACK", offset: CGSize(width: 0, height: -76), action: onMenu, boxed: false)
-            wheelButton("<<", offset: CGSize(width: -78, height: 0), action: onPrevious, boxed: true)
-            wheelButton(">>", offset: CGSize(width: 78, height: 0), action: onNext, boxed: true)
-            wheelButton(">II", offset: CGSize(width: 0, height: 78), action: onPlayPause, boxed: true)
+            wheelButton("<<", offset: CGSize(width: -78, height: 0), action: onPrevious, longAction: onPreviousLong, boxed: true)
+            wheelButton(">>", offset: CGSize(width: 78, height: 0), action: onNext, longAction: onNextLong, boxed: true)
+            wheelButton(">II", offset: CGSize(width: 0, height: 78), action: onPlayPause, longAction: onPlayPauseLong, boxed: true)
 
-            Button(action: onSelect) {
+            Button {
+                pulse(.medium)
+                onSelect()
+            } label: {
                 Circle()
                     .fill(
                         RadialGradient(
@@ -62,8 +69,15 @@ struct ClickWheelView: View {
         .frame(width: 220, height: 220)
     }
 
-    private func wheelButton(_ label: String, offset: CGSize, action: @escaping () -> Void, boxed: Bool) -> some View {
+    private func wheelButton(
+        _ label: String,
+        offset: CGSize,
+        action: @escaping () -> Void,
+        longAction: @escaping () -> Void = {},
+        boxed: Bool
+    ) -> some View {
         Button {
+            pulse(.light)
             action()
             pressedLabel = label
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
@@ -89,6 +103,13 @@ struct ClickWheelView: View {
                 }
         }
         .buttonStyle(.plain)
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: 0.45)
+                .onEnded { _ in
+                    pulse(.heavy)
+                    longAction()
+                }
+        )
         .offset(offset)
     }
 
@@ -98,23 +119,21 @@ struct ClickWheelView: View {
                 let center = CGPoint(x: 110, y: 110)
                 let vector = CGVector(dx: value.location.x - center.x, dy: value.location.y - center.y)
                 let angle = Angle(radians: atan2(vector.dy, vector.dx))
+                let steps = engine.update(angleDegrees: angle.degrees)
 
-                guard let lastAngle else {
-                    self.lastAngle = angle
-                    return
-                }
-
-                var delta = angle.degrees - lastAngle.degrees
-                if delta > 180 { delta -= 360 }
-                if delta < -180 { delta += 360 }
-
-                if abs(delta) > 18 {
-                    onRotate(delta > 0 ? 1 : -1)
-                    self.lastAngle = angle
+                guard steps != 0 else { return }
+                pulse(.light)
+                let direction = steps > 0 ? 1 : -1
+                for _ in 0..<abs(steps) {
+                    onRotate(direction)
                 }
             }
             .onEnded { _ in
-                lastAngle = nil
+                engine.reset()
             }
+    }
+
+    private func pulse(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        UIImpactFeedbackGenerator(style: style).impactOccurred()
     }
 }

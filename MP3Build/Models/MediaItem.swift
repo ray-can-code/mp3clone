@@ -3,6 +3,7 @@ import Foundation
 enum MediaKind: String, Codable, Equatable {
     case audio
     case video
+    case photo
 
     static func kind(forExtension fileExtension: String) -> MediaKind? {
         switch fileExtension.lowercased() {
@@ -10,9 +11,38 @@ enum MediaKind: String, Codable, Equatable {
             return .audio
         case "mp4", "m4v", "mov":
             return .video
+        case "jpg", "jpeg", "png", "heic", "webp":
+            return .photo
         default:
             return nil
         }
+    }
+
+    var shortLabel: String {
+        switch self {
+        case .audio: return "AUD"
+        case .video: return "MP4"
+        case .photo: return "PIC"
+        }
+    }
+}
+
+struct MediaPlaylist: Identifiable, Codable, Equatable {
+    let id: UUID
+    var name: String
+    var itemIDs: [UUID]
+    var createdAt: Date
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        itemIDs: [UUID] = [],
+        createdAt: Date = Date()
+    ) {
+        self.id = id
+        self.name = name
+        self.itemIDs = itemIDs
+        self.createdAt = createdAt
     }
 }
 

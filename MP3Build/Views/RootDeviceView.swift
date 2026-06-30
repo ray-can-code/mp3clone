@@ -41,17 +41,28 @@ struct RootDeviceView: View {
                     .frame(height: 210)
 
                 ClickWheelView(
-                    onRotate: navigation.moveSelection,
+                    onRotate: rotateWheel,
                     onMenu: navigation.back,
                     onSelect: navigation.select,
-                    onPrevious: {},
-                    onNext: {},
-                    onPlayPause: playback.togglePlayPause
+                    onPrevious: { playback.seek(by: -10) },
+                    onNext: { playback.seek(by: 10) },
+                    onPlayPause: playback.togglePlayPause,
+                    onPreviousLong: { playback.seek(by: -30) },
+                    onNextLong: { playback.seek(by: 30) },
+                    onPlayPauseLong: playback.stop
                 )
                 .environment(\.playerTheme, theme)
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 64)
+        }
+    }
+
+    private func rotateWheel(_ delta: Int) {
+        if navigation.currentScreen == .home {
+            navigation.moveSelection(delta: delta)
+        } else if navigation.currentScreen == .nowPlaying {
+            playback.seek(by: TimeInterval(delta * 5))
         }
     }
 }

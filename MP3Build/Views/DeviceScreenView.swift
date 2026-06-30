@@ -1,3 +1,4 @@
+import AVFoundation
 import SwiftUI
 
 struct DeviceScreenView: View {
@@ -87,36 +88,66 @@ struct DeviceScreenView: View {
         case .videos:
             MediaListView(kind: .video)
         case .audiobooks:
-            PlaceholderFeatureView(title: "Audiobooks", subtitle: "Coming soon")
+            MediaListView(kind: .audio, mode: .audiobooks)
         case .photos:
-            PlaceholderFeatureView(title: "Photos", subtitle: "Coming soon")
+            MediaListView(kind: .photo)
         case .fmRadio:
-            PlaceholderFeatureView(title: "FM Radio", subtitle: "iPhone has no FM tuner")
+            DeviceStatusFeatureView(
+                title: "FM Radio",
+                lines: [
+                    "No FM tuner in iPhone",
+                    "Use imported MP3/MP4",
+                    "Local playback only"
+                ]
+            )
         case .bluetooth:
-            PlaceholderFeatureView(title: "Bluetooth", subtitle: "Use iOS settings")
+            BluetoothFeatureView()
         case .settings:
             SettingsView()
         }
     }
 }
 
-private struct PlaceholderFeatureView: View {
+private struct DeviceStatusFeatureView: View {
     @Environment(\.playerTheme) private var theme
     var title: String
-    var subtitle: String
+    var lines: [String]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 7) {
             Spacer()
             Text(title)
                 .font(theme.screenFont(size: 23, weight: .bold))
                 .foregroundColor(theme.primaryText)
-            Text(subtitle)
-                .font(theme.screenFont(size: 15))
-                .foregroundColor(theme.secondaryText)
+            ForEach(lines, id: \.self) { line in
+                Text(line)
+                    .font(theme.screenFont(size: 14, weight: .bold))
+                    .foregroundColor(theme.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+            }
             Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .shadow(color: .black, radius: 1, x: 1, y: 1)
+    }
+}
+
+private struct BluetoothFeatureView: View {
+    @Environment(\.playerTheme) private var theme
+    @State private var routeName = "iPhone Speaker"
+
+    var body: some View {
+        DeviceStatusFeatureView(
+            title: "Bluetooth",
+            lines: [
+                "Output: \(routeName)",
+                "Pair in iOS Settings",
+                "Wheel controls still work"
+            ]
+        )
+        .onAppear {
+            routeName = AVAudioSession.sharedInstance().currentRoute.outputs.first?.portName ?? "iPhone Speaker"
+        }
     }
 }

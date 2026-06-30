@@ -21,14 +21,17 @@ final class PlaybackController: ObservableObject {
 
     private var timeObserver: Any?
 
-    func play(item: MediaItem, fileURL: URL) {
+    func play(item: MediaItem, fileURL: URL, resumeAt: TimeInterval = 0) {
         configureAudioSession()
         removeTimeObserver()
         currentItem = item
         player = AVPlayer(url: fileURL)
         duration = player?.currentItem?.asset.duration.seconds.finiteOrZero ?? 0
-        currentTime = 0
+        currentTime = max(0, resumeAt)
         addTimeObserver()
+        if resumeAt > 0 {
+            player?.seek(to: CMTime(seconds: resumeAt, preferredTimescale: 600))
+        }
         player?.play()
         state = .playing
         updateNowPlayingInfo()

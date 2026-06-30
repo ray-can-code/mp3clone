@@ -11,8 +11,10 @@ struct ImportButton: UIViewControllerRepresentable {
             UTType.movie,
             UTType.mpeg4Movie,
             UTType.quickTimeMovie,
+            UTType.image,
             UTType(filenameExtension: "mp3"),
-            UTType(filenameExtension: "flac")
+            UTType(filenameExtension: "flac"),
+            UTType(filenameExtension: "webp")
         ].compactMap { $0 }
 
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: types)

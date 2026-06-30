@@ -11,10 +11,14 @@ final class MediaLibrary: ObservableObject {
 
     @Published private(set) var items: [MediaItem] = []
     @Published private(set) var resumePositions: [UUID: TimeInterval] = [:]
+    @Published private(set) var favoriteItemIDs: Set<UUID> = []
+    @Published private(set) var playlists: [MediaPlaylist] = []
 
     private let rootDirectory: URL
     private let indexURL: URL
     private let resumeURL: URL
+    private let favoritesURL: URL
+    private let playlistsURL: URL
     private let fileManager: FileManager
 
     init(
@@ -24,6 +28,8 @@ final class MediaLibrary: ObservableObject {
         self.rootDirectory = rootDirectory
         self.indexURL = rootDirectory.appendingPathComponent("library.json")
         self.resumeURL = rootDirectory.appendingPathComponent("resume-positions.json")
+        self.favoritesURL = rootDirectory.appendingPathComponent("favorites.json")
+        self.playlistsURL = rootDirectory.appendingPathComponent("playlists.json")
         self.fileManager = fileManager
         load()
     }
@@ -36,9 +42,16 @@ final class MediaLibrary: ObservableObject {
         items.filter { $0.kind == .video }
     }
 
+    var photoItems: [MediaItem] {
+        items.filter { $0.kind == .photo }
+    }
+
     func replaceItems(_ newItems: [MediaItem]) throws {
         items = newItems
+        pruneStateForCurrentItems()
         try save()
+        try saveFavorites()
+        try savePlaylists()
     }
 
     func items(sortedBy sortMode: MediaSortMode) -> [MediaItem] {
@@ -66,6 +79,15 @@ final class MediaLibrary: ObservableObject {
         guard let kind = MediaKind.kind(forExtension: sourceURL.pathExtension) else {
             throw LibraryError.unsupportedFile
         }
+
+        guard kind != .photo else {
+            return MediaItem(
+                title: sourceURL.deletingPathExtension().lastPathComponent,
+                filename: sourceURL.lastPathComponent,
+                kind: .photo
+            )
+        }
+
         let asset = AVURLAsset(url: sourceURL)
         let metadata = asset.commonMetadata
 
@@ -102,7 +124,9 @@ final class MediaLibrary: ObservableObject {
             throw LibraryError.unreadableFile
         }
 
-        item.artworkFilename = try saveArtworkIfAvailable(from: sourceURL, itemID: item.id)
+        if item.kind != .photo {
+            item.artworkFilename = try saveArtworkIfAvailable(from: sourceURL, itemID: item.id)
+        }
 
         items.removeAll { $0.filename == item.filename }
         items.append(item)
@@ -117,8 +141,16 @@ final class MediaLibrary: ObservableObject {
         }
         items.removeAll { $0.id == item.id }
         resumePositions[item.id] = nil
+        favoriteItemIDs.remove(item.id)
+        playlists = playlists.map { playlist in
+            var updated = playlist
+            updated.itemIDs.removeAll { $0 == item.id }
+            return updated
+        }
         try save()
         try saveResumePositions()
+        try saveFavorites()
+        try savePlaylists()
     }
 
     func setResumePosition(_ position: TimeInterval, for item: MediaItem) throws {
@@ -130,6 +162,40 @@ final class MediaLibrary: ObservableObject {
         resumePositions[item.id] ?? 0
     }
 
+    func isFavorite(_ item: MediaItem) -> Bool {
+        favoriteItemIDs.contains(item.id)
+    }
+
+    func toggleFavorite(_ item: MediaItem) throws {
+        if favoriteItemIDs.contains(item.id) {
+            favoriteItemIDs.remove(item.id)
+        } else {
+            favoriteItemIDs.insert(item.id)
+        }
+        try saveFavorites()
+    }
+
+    func items(in playlist: MediaPlaylist) -> [MediaItem] {
+        let lookup = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
+        return playlist.itemIDs.compactMap { lookup[$0] }
+    }
+
+    func add(_ item: MediaItem, toPlaylistNamed name: String) throws {
+        if let index = playlists.firstIndex(where: { $0.name == name }) {
+            if !playlists[index].itemIDs.contains(item.id) {
+                playlists[index].itemIDs.append(item.id)
+            }
+        } else {
+            playlists.append(MediaPlaylist(name: name, itemIDs: [item.id]))
+        }
+        try savePlaylists()
+    }
+
+    func artworkURL(for item: MediaItem) -> URL? {
+        guard let artworkFilename = item.artworkFilename else { return nil }
+        return rootDirectory.appendingPathComponent(artworkFilename)
+    }
+
     func fileURL(for item: MediaItem) -> URL {
         rootDirectory.appendingPathComponent(item.filename)
     }
@@ -139,11 +205,16 @@ final class MediaLibrary: ObservableObject {
               let decoded = try? JSONDecoder().decode([MediaItem].self, from: data) else {
             items = []
             resumePositions = loadResumePositions()
+            favoriteItemIDs = loadFavorites()
+            playlists = loadPlaylists()
             return
         }
 
         items = decoded
         resumePositions = loadResumePositions()
+        favoriteItemIDs = loadFavorites()
+        playlists = loadPlaylists()
+        pruneStateForCurrentItems()
     }
 
     private func save() throws {
@@ -164,6 +235,44 @@ final class MediaLibrary: ObservableObject {
         try fileManager.createDirectory(at: rootDirectory, withIntermediateDirectories: true)
         let data = try JSONEncoder().encode(resumePositions)
         try data.write(to: resumeURL, options: [.atomic])
+    }
+
+    private func loadFavorites() -> Set<UUID> {
+        guard let data = try? Data(contentsOf: favoritesURL),
+              let decoded = try? JSONDecoder().decode(Set<UUID>.self, from: data) else {
+            return []
+        }
+        return decoded
+    }
+
+    private func saveFavorites() throws {
+        try fileManager.createDirectory(at: rootDirectory, withIntermediateDirectories: true)
+        let data = try JSONEncoder().encode(favoriteItemIDs)
+        try data.write(to: favoritesURL, options: [.atomic])
+    }
+
+    private func loadPlaylists() -> [MediaPlaylist] {
+        guard let data = try? Data(contentsOf: playlistsURL),
+              let decoded = try? JSONDecoder().decode([MediaPlaylist].self, from: data) else {
+            return [MediaPlaylist(name: "Favorites")]
+        }
+        return decoded
+    }
+
+    private func savePlaylists() throws {
+        try fileManager.createDirectory(at: rootDirectory, withIntermediateDirectories: true)
+        let data = try JSONEncoder().encode(playlists)
+        try data.write(to: playlistsURL, options: [.atomic])
+    }
+
+    private func pruneStateForCurrentItems() {
+        let validIDs = Set(items.map(\.id))
+        favoriteItemIDs = favoriteItemIDs.intersection(validIDs)
+        playlists = playlists.map { playlist in
+            var updated = playlist
+            updated.itemIDs = updated.itemIDs.filter { validIDs.contains($0) }
+            return updated
+        }
     }
 
     private func saveArtworkIfAvailable(from sourceURL: URL, itemID: UUID) throws -> String? {

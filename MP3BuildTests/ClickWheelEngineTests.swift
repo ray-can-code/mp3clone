@@ -23,6 +23,13 @@ final class ClickWheelEngineTests: XCTestCase {
         XCTAssertEqual(engine.update(angleDegrees: 80), 4)
     }
 
+    func testMaximumStepsCapsLargeRotation() {
+        var engine = ClickWheelEngine(stepDegrees: 10, maximumStepsPerUpdate: 3)
+
+        XCTAssertEqual(engine.update(angleDegrees: 0), 0)
+        XCTAssertEqual(engine.update(angleDegrees: 120), 3)
+    }
+
     func testWraparoundUsesShortestAngleDelta() {
         var engine = ClickWheelEngine(stepDegrees: 18)
 
