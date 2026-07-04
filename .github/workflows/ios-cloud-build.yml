@@ -44,9 +44,6 @@ jobs:
             grep -Ei "error:|fatal error|failed|cannot|no such module|tests failed|xctest" build/xcode-test.log | tail -120 | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g' | while IFS= read -r line; do
               echo "::error::$line"
             done
-            tail -260 build/xcode-test.log | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g' | while IFS= read -r line; do
-              echo "::error::$line"
-            done
           fi
           exit "$status"
 
