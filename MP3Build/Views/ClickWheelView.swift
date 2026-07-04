@@ -152,6 +152,6 @@ struct ClickWheelView: View {
 
     private func feedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
         UIImpactFeedbackGenerator(style: style).impactOccurred()
-        AudioServicesPlaySystemSound(1104)
+        AudioServicesPlaySystemSound(SystemSoundID(1104))
     }
 }
