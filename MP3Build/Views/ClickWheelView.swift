@@ -46,7 +46,7 @@ struct ClickWheelView: View {
             wheelIconButton("playpause.fill", offset: CGSize(width: 0, height: 78), action: onPlayPause, longAction: onPlayPauseLong)
 
             Button {
-                pulse(.medium)
+                feedback(.medium)
                 onSelect()
             } label: {
                 Circle()
