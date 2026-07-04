@@ -7,6 +7,13 @@ final class PlayerNavigationModel: ObservableObject {
         let id = UUID()
         let title: String
         let screen: PlayerScreen
+        let isEnabled: Bool
+
+        init(title: String, screen: PlayerScreen, isEnabled: Bool = true) {
+            self.title = title
+            self.screen = screen
+            self.isEnabled = isEnabled
+        }
     }
 
     @Published private(set) var stack: [PlayerScreen] = [.home]
@@ -16,10 +23,10 @@ final class PlayerNavigationModel: ObservableObject {
         HomeEntry(title: "Now Playing", screen: .nowPlaying),
         HomeEntry(title: "Music", screen: .music),
         HomeEntry(title: "Videos", screen: .videos),
-        HomeEntry(title: "Audiobooks", screen: .audiobooks),
-        HomeEntry(title: "Photos", screen: .photos),
-        HomeEntry(title: "FM Radio", screen: .fmRadio),
-        HomeEntry(title: "Bluetooth", screen: .bluetooth),
+        HomeEntry(title: "Audiobooks", screen: .audiobooks, isEnabled: false),
+        HomeEntry(title: "Photos", screen: .photos, isEnabled: false),
+        HomeEntry(title: "FM Radio", screen: .fmRadio, isEnabled: false),
+        HomeEntry(title: "Bluetooth", screen: .bluetooth, isEnabled: false),
         HomeEntry(title: "Settings", screen: .settings)
     ]
 
@@ -35,6 +42,7 @@ final class PlayerNavigationModel: ObservableObject {
 
     func select() {
         guard currentScreen == .home else { return }
+        guard homeEntries[selectedHomeIndex].isEnabled else { return }
         stack.append(homeEntries[selectedHomeIndex].screen)
     }
 

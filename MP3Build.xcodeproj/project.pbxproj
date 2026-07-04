@@ -56,6 +56,7 @@
 		011000000000000000000014 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000014 /* stop.png */; };
 		011000000000000000000015 /* headsetWithoutMic.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000015 /* headsetWithoutMic.png */; };
 		011000000000000000000016 /* blConnected.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000016 /* blConnected.png */; };
+		011000000000000000000017 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000017 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,6 +121,7 @@
 		021000000000000000000014 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
 		021000000000000000000015 /* headsetWithoutMic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = headsetWithoutMic.png; sourceTree = "<group>"; };
 		021000000000000000000016 /* blConnected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blConnected.png; sourceTree = "<group>"; };
+		021000000000000000000017 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 				070000000000000000000004 /* Services */,
 				070000000000000000000005 /* Views */,
 				071000000000000000000001 /* Resources */,
+				021000000000000000000017 /* Assets.xcassets */,
 			);
 			path = MP3Build;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 				011000000000000000000014 /* stop.png in Resources */,
 				011000000000000000000015 /* headsetWithoutMic.png in Resources */,
 				011000000000000000000016 /* blConnected.png in Resources */,
+				011000000000000000000017 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -518,6 +522,7 @@
 		0C0000000000000000000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -547,6 +552,7 @@
 		0C0000000000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";

@@ -20,15 +20,34 @@ final class PlaybackController: ObservableObject {
     @Published var videoAspectMode: VideoAspectMode = .fit
 
     private var timeObserver: Any?
+    private var endObserver: NSObjectProtocol?
+    private var queue: [(item: MediaItem, fileURL: URL)] = []
+    private var queueIndex: Int = 0
 
-    func play(item: MediaItem, fileURL: URL, resumeAt: TimeInterval = 0) {
+    func play(
+        item: MediaItem,
+        fileURL: URL,
+        resumeAt: TimeInterval = 0,
+        queue: [(MediaItem, URL)] = []
+    ) {
+        let resolvedQueue = queue.isEmpty ? [(item, fileURL)] : queue
+        self.queue = resolvedQueue.map { (item: $0.0, fileURL: $0.1) }
+        self.queueIndex = self.queue.firstIndex(where: { $0.item.id == item.id }) ?? 0
+        playCurrentQueueItem(resumeAt: resumeAt)
+    }
+
+    private func playCurrentQueueItem(resumeAt: TimeInterval = 0) {
+        guard queue.indices.contains(queueIndex) else { return }
+        let entry = queue[queueIndex]
         configureAudioSession()
         removeTimeObserver()
-        currentItem = item
-        player = AVPlayer(url: fileURL)
+        removeEndObserver()
+        currentItem = entry.item
+        player = AVPlayer(url: entry.fileURL)
         duration = player?.currentItem?.asset.duration.seconds.finiteOrZero ?? 0
         currentTime = max(0, resumeAt)
         addTimeObserver()
+        addEndObserver()
         if resumeAt > 0 {
             player?.seek(to: CMTime(seconds: resumeAt, preferredTimescale: 600))
         }
@@ -76,10 +95,13 @@ final class PlaybackController: ObservableObject {
     func stop() {
         player?.pause()
         removeTimeObserver()
+        removeEndObserver()
         player = nil
         currentItem = nil
         currentTime = 0
         duration = 0
+        queue = []
+        queueIndex = 0
         state = .stopped
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
@@ -91,6 +113,40 @@ final class PlaybackController: ObservableObject {
         } catch {
             state = .failed("Audio session failed")
         }
+    }
+
+    private func addEndObserver() {
+        guard let item = player?.currentItem else { return }
+        endObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.playNextFromQueue()
+            }
+        }
+    }
+
+    private func removeEndObserver() {
+        if let endObserver {
+            NotificationCenter.default.removeObserver(endObserver)
+        }
+        endObserver = nil
+    }
+
+    private func playNextFromQueue() {
+        guard queueIndex + 1 < queue.count else {
+            state = .stopped
+            player?.seek(to: .zero)
+            player?.pause()
+            currentTime = 0
+            updateNowPlayingInfo()
+            return
+        }
+
+        queueIndex += 1
+        playCurrentQueueItem()
     }
 
     private func addTimeObserver() {

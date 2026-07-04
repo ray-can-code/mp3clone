@@ -8,53 +8,60 @@ struct RootDeviceView: View {
     private let theme = PlayerTheme.defaultTheme
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
+        GeometryReader { proxy in
+            let outerWidth = min(proxy.size.width - 18, 360)
+            let outerHeight = min(proxy.size.height - 18, outerWidth * 1.72)
+            let screenHeight = min(252, outerHeight * 0.42)
+            let wheelSize = min(214, outerWidth * 0.62)
 
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [theme.bodyTop, theme.bodyBottom],
-                        startPoint: .top,
-                        endPoint: .bottom
+            ZStack {
+                Color.black.ignoresSafeArea()
+
+                RoundedRectangle(cornerRadius: 34, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [theme.bodyTop, theme.bodyBottom],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
                     )
-                )
-                .overlay(alignment: .top) {
-                    RoundedRectangle(cornerRadius: 34, style: .continuous)
-                        .stroke(Color.white.opacity(0.72), lineWidth: 4)
-                }
-                .overlay {
-                    RoundedRectangle(cornerRadius: 34, style: .continuous)
-                        .stroke(theme.bodyEdge.opacity(0.36), lineWidth: 2)
-                }
-                .shadow(color: .black.opacity(0.42), radius: 22, y: 12)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 54)
+                    .overlay(alignment: .top) {
+                        RoundedRectangle(cornerRadius: 34, style: .continuous)
+                            .stroke(Color.white.opacity(0.72), lineWidth: 4)
+                    }
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 34, style: .continuous)
+                            .stroke(theme.bodyEdge.opacity(0.36), lineWidth: 2)
+                    }
+                    .shadow(color: .black.opacity(0.42), radius: 22, y: 12)
+                    .frame(width: outerWidth, height: outerHeight)
 
-            VStack(spacing: 18) {
-                DeviceScreenView()
-                    .environmentObject(library)
-                    .environmentObject(playback)
-                    .environmentObject(navigation)
+                VStack(spacing: 30) {
+                    DeviceScreenView()
+                        .environmentObject(library)
+                        .environmentObject(playback)
+                        .environmentObject(navigation)
+                        .environment(\.playerTheme, theme)
+                        .frame(width: outerWidth - 28, height: screenHeight)
+
+                    ClickWheelView(
+                        onRotate: rotateWheel,
+                        onMenu: navigation.back,
+                        onSelect: navigation.select,
+                        onPrevious: { playback.seek(by: -10) },
+                        onNext: { playback.seek(by: 10) },
+                        onPlayPause: playback.togglePlayPause,
+                        onPreviousLong: { playback.seek(by: -30) },
+                        onNextLong: { playback.seek(by: 30) },
+                        onPlayPauseLong: playback.stop
+                    )
                     .environment(\.playerTheme, theme)
-                    .frame(maxWidth: 340)
-                    .frame(height: 210)
-
-                ClickWheelView(
-                    onRotate: rotateWheel,
-                    onMenu: navigation.back,
-                    onSelect: navigation.select,
-                    onPrevious: { playback.seek(by: -10) },
-                    onNext: { playback.seek(by: 10) },
-                    onPlayPause: playback.togglePlayPause,
-                    onPreviousLong: { playback.seek(by: -30) },
-                    onNextLong: { playback.seek(by: 30) },
-                    onPlayPauseLong: playback.stop
-                )
-                .environment(\.playerTheme, theme)
+                    .frame(width: wheelSize, height: wheelSize)
+                }
+                .padding(.top, 28)
+                .frame(width: outerWidth, height: outerHeight, alignment: .top)
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 64)
+            .frame(width: proxy.size.width, height: proxy.size.height)
         }
     }
 

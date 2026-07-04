@@ -36,4 +36,13 @@ final class PlayerNavigationModelTests: XCTestCase {
             "Settings"
         ])
     }
+
+    func testDisabledPlaceholderTabsDoNotOpen() {
+        let model = PlayerNavigationModel()
+        model.selectedHomeIndex = model.homeEntries.firstIndex(where: { $0.title == "Photos" })!
+
+        model.select()
+
+        XCTAssertEqual(model.currentScreen, .home)
+    }
 }

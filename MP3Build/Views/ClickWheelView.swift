@@ -1,4 +1,5 @@
 import SwiftUI
+import AudioToolbox
 import UIKit
 
 struct ClickWheelView: View {
@@ -39,10 +40,10 @@ struct ClickWheelView: View {
                 }
                 .gesture(rotationGesture)
 
-            wheelButton("BACK", offset: CGSize(width: 0, height: -76), action: onMenu, boxed: false)
-            wheelButton("<<", offset: CGSize(width: -78, height: 0), action: onPrevious, longAction: onPreviousLong, boxed: true)
-            wheelButton(">>", offset: CGSize(width: 78, height: 0), action: onNext, longAction: onNextLong, boxed: true)
-            wheelButton(">II", offset: CGSize(width: 0, height: 78), action: onPlayPause, longAction: onPlayPauseLong, boxed: true)
+            wheelTextButton("BACK", offset: CGSize(width: 0, height: -76), action: onMenu)
+            wheelIconButton("backward.fill", offset: CGSize(width: -78, height: 0), action: onPrevious, longAction: onPreviousLong)
+            wheelIconButton("forward.fill", offset: CGSize(width: 78, height: 0), action: onNext, longAction: onNextLong)
+            wheelIconButton("playpause.fill", offset: CGSize(width: 0, height: 78), action: onPlayPause, longAction: onPlayPauseLong)
 
             Button {
                 pulse(.medium)
@@ -69,15 +70,9 @@ struct ClickWheelView: View {
         .frame(width: 220, height: 220)
     }
 
-    private func wheelButton(
-        _ label: String,
-        offset: CGSize,
-        action: @escaping () -> Void,
-        longAction: @escaping () -> Void = {},
-        boxed: Bool
-    ) -> some View {
+    private func wheelTextButton(_ label: String, offset: CGSize, action: @escaping () -> Void) -> some View {
         Button {
-            pulse(.light)
+            feedback(.light)
             action()
             pressedLabel = label
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
@@ -85,28 +80,50 @@ struct ClickWheelView: View {
             }
         } label: {
             Text(label)
-                .font(.system(size: boxed ? 17 : 13, weight: .heavy, design: .rounded))
+                .font(.system(size: 13, weight: .heavy, design: .rounded))
                 .foregroundColor(theme.wheelGlyph)
-                .frame(width: boxed ? 34 : 70, height: boxed ? 28 : 36)
+                .frame(width: 70, height: 36)
                 .background {
-                    if boxed {
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(Color(red: 0.42, green: 0.58, blue: 0.68).opacity(pressedLabel == label ? 0.92 : 0.78))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .stroke(Color.white.opacity(0.38), lineWidth: 1)
-                            }
-                    } else {
-                        Capsule()
-                            .fill(pressedLabel == label ? Color.black.opacity(0.08) : Color.clear)
-                    }
+                    Capsule()
+                        .fill(pressedLabel == label ? Color.black.opacity(0.08) : Color.clear)
+                }
+        }
+        .buttonStyle(.plain)
+        .offset(offset)
+    }
+
+    private func wheelIconButton(
+        _ systemName: String,
+        offset: CGSize,
+        action: @escaping () -> Void,
+        longAction: @escaping () -> Void = {}
+    ) -> some View {
+        Button {
+            feedback(.light)
+            action()
+            pressedLabel = systemName
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                pressedLabel = nil
+            }
+        } label: {
+            Image(systemName: systemName)
+                .font(.system(size: 18, weight: .heavy))
+                .foregroundColor(theme.wheelGlyph)
+                .frame(width: 38, height: 31)
+                .background {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(Color(red: 0.42, green: 0.58, blue: 0.68).opacity(pressedLabel == systemName ? 0.92 : 0.78))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                .stroke(Color.white.opacity(0.38), lineWidth: 1)
+                        }
                 }
         }
         .buttonStyle(.plain)
         .simultaneousGesture(
             LongPressGesture(minimumDuration: 0.45)
                 .onEnded { _ in
-                    pulse(.heavy)
+                    feedback(.heavy)
                     longAction()
                 }
         )
@@ -122,7 +139,7 @@ struct ClickWheelView: View {
                 let steps = engine.update(angleDegrees: angle.degrees)
 
                 guard steps != 0 else { return }
-                pulse(.light)
+                feedback(.light)
                 let direction = steps > 0 ? 1 : -1
                 for _ in 0..<abs(steps) {
                     onRotate(direction)
@@ -133,7 +150,8 @@ struct ClickWheelView: View {
             }
     }
 
-    private func pulse(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
+    private func feedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
         UIImpactFeedbackGenerator(style: style).impactOccurred()
+        AudioServicesPlaySystemSound(1104)
     }
 }

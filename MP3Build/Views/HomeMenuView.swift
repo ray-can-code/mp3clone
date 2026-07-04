@@ -11,16 +11,17 @@ struct HomeMenuView: View {
                 ForEach(Array(navigation.homeEntries.enumerated()), id: \.offset) { index, entry in
                     FocusRow(
                         title: entry.title,
-                        isSelected: index == navigation.selectedHomeIndex
+                        isSelected: index == navigation.selectedHomeIndex,
+                        isEnabled: entry.isEnabled
                     )
                 }
             }
-            .frame(width: 150, alignment: .leading)
+            .frame(width: 154, alignment: .leading)
 
             Spacer(minLength: 2)
 
             if let iconName = selectedIconName {
-                Image(iconName)
+                Image.themeAsset(iconName)
                     .resizable()
                     .interpolation(.none)
                     .scaledToFit()
@@ -54,13 +55,14 @@ private struct FocusRow: View {
     @Environment(\.playerTheme) private var theme
     var title: String
     var isSelected: Bool
+    var isEnabled: Bool
 
     var body: some View {
         HStack(spacing: 4) {
             Text(title)
-                .font(theme.screenFont(size: 20, weight: .bold))
+                .font(theme.screenFont(size: 16, weight: .bold))
                 .lineLimit(1)
-                .minimumScaleFactor(0.58)
+                .minimumScaleFactor(0.70)
                 .shadow(color: isSelected ? .clear : .black, radius: 1, x: 1, y: 1)
 
             Spacer(minLength: 2)
@@ -79,8 +81,8 @@ private struct FocusRow: View {
                 }
             }
         }
-        .foregroundColor(isSelected ? Color(red: 0.18, green: 0.18, blue: 0.18) : theme.primaryText)
-        .frame(width: 146, height: 22, alignment: .leading)
+        .foregroundColor(rowColor)
+        .frame(width: 150, height: 19, alignment: .leading)
         .padding(.horizontal, 2)
         .background {
             if isSelected, let selectedRowImage = theme.selectedRowImageName {
@@ -92,5 +94,10 @@ private struct FocusRow: View {
             }
         }
         .animation(.easeOut(duration: 0.16), value: isSelected)
+    }
+
+    private var rowColor: Color {
+        if isSelected { return Color(red: 0.18, green: 0.18, blue: 0.18) }
+        return isEnabled ? theme.primaryText : theme.primaryText.opacity(0.45)
     }
 }

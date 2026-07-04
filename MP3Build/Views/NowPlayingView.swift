@@ -7,38 +7,16 @@ struct NowPlayingView: View {
     @EnvironmentObject private var library: MediaLibrary
     @EnvironmentObject private var playback: PlaybackController
 
-    @State private var expandedVideo = false
     @State private var showingFullScreenVideo = false
 
     var body: some View {
-        VStack(spacing: 7) {
-            if let item = playback.currentItem {
-                mediaPreview(for: item)
-
-                Text(item.title)
-                    .font(theme.screenFont(size: 16, weight: .bold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.70)
-                    .foregroundColor(theme.primaryText)
-
-                if let artist = item.artist, !artist.isEmpty {
-                    Text(artist)
-                        .font(theme.screenFont(size: 12))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.70)
-                        .foregroundColor(theme.secondaryText)
-                }
-
-                progressControls(for: item)
+        Group {
+            if let item = playback.currentItem, item.kind == .video {
+                videoBody(for: item)
+            } else if let item = playback.currentItem {
+                audioBody(for: item)
             } else {
-                Spacer()
-                Text("Nothing Playing")
-                    .font(theme.screenFont(size: 20, weight: .bold))
-                    .foregroundColor(theme.secondaryText)
-                Text("Import local music or MP4")
-                    .font(theme.screenFont(size: 13))
-                    .foregroundColor(theme.secondaryText)
-                Spacer()
+                emptyBody
             }
         }
         .fullScreenCover(isPresented: $showingFullScreenVideo) {
@@ -51,46 +29,91 @@ struct NowPlayingView: View {
         }
     }
 
-    @ViewBuilder
-    private func mediaPreview(for item: MediaItem) -> some View {
-        if item.kind == .video, let player = playback.player {
-            ZStack {
-                Color.black
-                VideoPlayer(player: player)
-                    .aspectRatio(contentMode: playback.videoAspectMode.contentMode)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: expandedVideo ? 144 : 102)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .onTapGesture {
-                showingFullScreenVideo = true
-            }
-        } else {
-            ZStack {
-                if let artworkURL = library.artworkURL(for: item),
-                   let image = UIImage(contentsOfFile: artworkURL.path) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(theme.screenGloss.opacity(0.55))
-                    VStack(spacing: 7) {
-                        Circle()
-                            .stroke(theme.focus, lineWidth: 6)
-                            .frame(width: 48, height: 48)
-                        Text("AUDIO")
-                            .font(theme.screenFont(size: 14, weight: .bold))
+    private func videoBody(for item: MediaItem) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            if let player = playback.player {
+                PlayerVideoSurface(player: player)
+                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    .onTapGesture {
+                        showingFullScreenVideo = true
                     }
-                    .foregroundColor(theme.focus)
-                }
+            } else {
+                Color.black
             }
-            .frame(height: 92)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+            Text(item.title)
+                .font(theme.screenFont(size: 11, weight: .bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.58)
+                .foregroundColor(theme.primaryText.opacity(0.88))
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(Color.black.opacity(0.42))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func audioBody(for item: MediaItem) -> some View {
+        VStack(spacing: 7) {
+            mediaPreview(for: item)
+
+            Text(item.title)
+                .font(theme.screenFont(size: 16, weight: .bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.70)
+                .foregroundColor(theme.primaryText)
+
+            if let artist = item.artist, !artist.isEmpty {
+                Text(artist)
+                    .font(theme.screenFont(size: 12))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.70)
+                    .foregroundColor(theme.secondaryText)
+            }
+
+            progressControls()
         }
     }
 
-    private func progressControls(for item: MediaItem) -> some View {
+    private var emptyBody: some View {
+        VStack(spacing: 4) {
+            Spacer()
+            Text("Nothing Playing")
+                .font(theme.screenFont(size: 20, weight: .bold))
+                .foregroundColor(theme.secondaryText)
+            Text("Import local music or MP4")
+                .font(theme.screenFont(size: 13))
+                .foregroundColor(theme.secondaryText)
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private func mediaPreview(for item: MediaItem) -> some View {
+        ZStack {
+            if let artworkURL = library.artworkURL(for: item),
+               let image = UIImage(contentsOfFile: artworkURL.path) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(theme.screenGloss.opacity(0.55))
+                VStack(spacing: 7) {
+                    Circle()
+                        .stroke(theme.focus, lineWidth: 6)
+                        .frame(width: 48, height: 48)
+                    Text("AUDIO")
+                        .font(theme.screenFont(size: 14, weight: .bold))
+                }
+                .foregroundColor(theme.focus)
+            }
+        }
+        .frame(height: 92)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private func progressControls() -> some View {
         VStack(spacing: 5) {
             Slider(
                 value: Binding(
@@ -109,33 +132,8 @@ struct NowPlayingView: View {
             .font(.system(size: 10, weight: .bold, design: .rounded))
             .foregroundColor(theme.secondaryText)
 
-            HStack(spacing: 10) {
-                Button("-10") {
-                    playback.seek(by: -10)
-                }
-
-                Button("+10") {
-                    playback.seek(by: 10)
-                }
-
-                Button(playback.videoAspectMode.label) {
-                    playback.toggleVideoAspectMode()
-                }
-                .disabled(item.kind != .video)
-
-                Button(expandedVideo ? "Small" : "Full") {
-                    if item.kind == .video {
-                        showingFullScreenVideo = true
-                    } else {
-                        expandedVideo.toggle()
-                    }
-                }
-                .disabled(item.kind != .video)
-
-                Button("Stop") {
-                    saveResumePositionIfNeeded()
-                    playback.stop()
-                }
+            Button("Stop") {
+                playback.stop()
             }
             .font(.system(size: 11, weight: .heavy, design: .rounded))
             .buttonStyle(.plain)
@@ -152,6 +150,31 @@ struct NowPlayingView: View {
         guard seconds.isFinite, seconds > 0 else { return "0:00" }
         let total = Int(seconds)
         return "\(total / 60):\(String(format: "%02d", total % 60))"
+    }
+}
+
+private struct PlayerVideoSurface: UIViewRepresentable {
+    let player: AVPlayer
+
+    func makeUIView(context: Context) -> PlayerVideoUIView {
+        let view = PlayerVideoUIView()
+        view.playerLayer.player = player
+        view.playerLayer.videoGravity = .resizeAspectFill
+        return view
+    }
+
+    func updateUIView(_ uiView: PlayerVideoUIView, context: Context) {
+        uiView.playerLayer.player = player
+    }
+}
+
+private final class PlayerVideoUIView: UIView {
+    override static var layerClass: AnyClass {
+        AVPlayerLayer.self
+    }
+
+    var playerLayer: AVPlayerLayer {
+        layer as! AVPlayerLayer
     }
 }
 

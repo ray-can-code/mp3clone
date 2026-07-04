@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct PlayerTheme {
     var name: String
@@ -102,5 +103,31 @@ extension EnvironmentValues {
     var playerTheme: PlayerTheme {
         get { self[PlayerThemeKey.self] }
         set { self[PlayerThemeKey.self] = newValue }
+    }
+}
+
+extension Image {
+    static func themeAsset(_ name: String) -> Image {
+        if let image = UIImage(named: name)
+            ?? UIImage(named: "\(name).png")
+            ?? Bundle.main.imageFromResource(named: name) {
+            return Image(uiImage: image)
+        }
+
+        return Image(name)
+    }
+}
+
+private extension Bundle {
+    func imageFromResource(named name: String) -> UIImage? {
+        let baseName = (name as NSString).deletingPathExtension
+        let ext = (name as NSString).pathExtension.isEmpty ? "png" : (name as NSString).pathExtension
+
+        if let url = url(forResource: baseName, withExtension: ext),
+           let image = UIImage(contentsOfFile: url.path) {
+            return image
+        }
+
+        return nil
     }
 }

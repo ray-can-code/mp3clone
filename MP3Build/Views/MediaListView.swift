@@ -27,6 +27,7 @@ struct MediaListView: View {
     @State private var sortMode: MediaSortMode = .title
     @State private var filterMode: MediaFilterMode = .all
     @State private var searchText = ""
+    @State private var messageVisible = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -62,7 +63,7 @@ struct MediaListView: View {
 
             TextField("Search", text: $searchText)
                 .textFieldStyle(.plain)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(theme.screenFont(size: 12, weight: .bold))
                 .foregroundColor(theme.primaryText)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -88,21 +89,24 @@ struct MediaListView: View {
 
             if let message {
                 Text(message)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(theme.screenFont(size: 11, weight: .bold))
                     .foregroundColor(theme.focus)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.68)
+                    .minimumScaleFactor(0.55)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .opacity(messageVisible ? 1 : 0)
+                    .animation(.easeInOut(duration: 0.35), value: messageVisible)
             }
         }
         .sheet(isPresented: $showingImporter) {
             ImportButton { url in
                 do {
                     try library.importFile(from: url)
-                    message = "Imported \(url.lastPathComponent)"
+                    showMessage("Imported \(shortName(url.lastPathComponent))")
                 } catch MediaLibrary.LibraryError.unsupportedFile {
-                    message = "Unsupported file"
+                    showMessage("Unsupported file")
                 } catch {
-                    message = "Could not import"
+                    showMessage("Could not import")
                 }
             }
         }
@@ -120,7 +124,7 @@ struct MediaListView: View {
                     Text(item.title)
                         .font(theme.screenFont(size: 15, weight: .bold))
                         .lineLimit(1)
-                        .minimumScaleFactor(0.70)
+                        .minimumScaleFactor(0.55)
                     Text(detail(for: item))
                         .font(theme.screenFont(size: 10))
                         .lineLimit(1)
@@ -266,11 +270,16 @@ struct MediaListView: View {
 
     private func open(_ item: MediaItem) {
         guard item.kind != .photo else {
-            message = "Saved photo: \(item.title)"
+            showMessage("Saved photo: \(shortName(item.title))")
             return
         }
 
-        playback.play(item: item, fileURL: library.fileURL(for: item), resumeAt: library.resumePosition(for: item))
+        playback.play(
+            item: item,
+            fileURL: library.fileURL(for: item),
+            resumeAt: library.resumePosition(for: item),
+            queue: playableQueue
+        )
         navigation.home()
         navigation.select()
     }
@@ -278,28 +287,49 @@ struct MediaListView: View {
     private func toggleFavorite(_ item: MediaItem) {
         do {
             try library.toggleFavorite(item)
-            message = library.isFavorite(item) ? "Favorite saved" : "Favorite removed"
+            showMessage(library.isFavorite(item) ? "Favorite saved" : "Favorite removed")
         } catch {
-            message = "Could not favorite"
+            showMessage("Could not favorite")
         }
     }
 
     private func addToMix(_ item: MediaItem) {
         do {
             try library.add(item, toPlaylistNamed: "Wheel Mix")
-            message = "Added to Wheel Mix"
+            showMessage("Added \(shortName(item.title)) to Wheel Mix")
         } catch {
-            message = "Could not add"
+            showMessage("Could not add")
         }
     }
 
     private func delete(_ item: MediaItem) {
         do {
             try library.delete(item)
-            message = "Deleted \(item.title)"
+            showMessage("Deleted \(shortName(item.title))")
         } catch {
-            message = "Could not delete"
+            showMessage("Could not delete")
         }
+    }
+
+    private var playableQueue: [(MediaItem, URL)] {
+        items
+            .filter { $0.kind != .photo }
+            .map { ($0, library.fileURL(for: $0)) }
+    }
+
+    private func showMessage(_ text: String) {
+        message = text
+        messageVisible = true
+        let current = text
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            guard message == current else { return }
+            messageVisible = false
+        }
+    }
+
+    private func shortName(_ text: String) -> String {
+        if text.count <= 22 { return text }
+        return "\(text.prefix(19))..."
     }
 
     private func format(_ seconds: TimeInterval) -> String {

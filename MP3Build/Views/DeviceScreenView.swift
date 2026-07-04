@@ -1,5 +1,6 @@
 import AVFoundation
 import SwiftUI
+import UIKit
 
 struct DeviceScreenView: View {
     @Environment(\.playerTheme) private var theme
@@ -12,26 +13,21 @@ struct DeviceScreenView: View {
             VStack(spacing: 4) {
                 HStack(spacing: 6) {
                     Text(title)
-                        .font(theme.screenFont(size: 20, weight: .bold))
+                        .font(theme.screenFont(size: 18, weight: .bold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
                     Spacer()
-                    if let batteryImageName = theme.batteryImageName {
-                        Image(batteryImageName)
-                            .resizable()
-                            .interpolation(.none)
-                            .scaledToFit()
-                            .frame(width: 27, height: 14)
-                            .accessibilityHidden(true)
-                    }
-                    Text("100%")
-                        .font(theme.screenFont(size: 15, weight: .bold))
+                    BatteryStatusView()
                 }
                 .foregroundColor(theme.primaryText)
                 .shadow(color: .black, radius: 1, x: 1, y: 1)
 
                 screenBody
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 7)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         .overlay {
@@ -45,7 +41,7 @@ struct DeviceScreenView: View {
     private var screenBackground: some View {
         ZStack {
             if let wallpaper = theme.screenWallpaperName {
-                Image(wallpaper)
+                Image.themeAsset(wallpaper)
                     .resizable()
                     .interpolation(.medium)
                     .scaledToFill()
@@ -53,9 +49,9 @@ struct DeviceScreenView: View {
                 theme.screenBackground
             }
 
-            theme.screenBackground.opacity(0.34)
+            theme.screenBackground.opacity(0.12)
             LinearGradient(
-                colors: [.black.opacity(0.20), .clear, .black.opacity(0.36)],
+                colors: [.black.opacity(0.10), .clear, .black.opacity(0.28)],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -104,6 +100,34 @@ struct DeviceScreenView: View {
             BluetoothFeatureView()
         case .settings:
             SettingsView()
+        }
+    }
+}
+
+private struct BatteryStatusView: View {
+    @Environment(\.playerTheme) private var theme
+    @State private var levelText: String?
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if let batteryImageName = theme.batteryImageName {
+                Image.themeAsset(batteryImageName)
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+                    .frame(width: 25, height: 13)
+                    .accessibilityHidden(true)
+            }
+
+            if let levelText {
+                Text(levelText)
+                    .font(theme.screenFont(size: 13, weight: .bold))
+            }
+        }
+        .onAppear {
+            UIDevice.current.isBatteryMonitoringEnabled = true
+            let level = UIDevice.current.batteryLevel
+            levelText = level >= 0 ? "\(Int((level * 100).rounded()))%" : nil
         }
     }
 }
