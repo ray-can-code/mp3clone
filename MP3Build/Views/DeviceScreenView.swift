@@ -5,29 +5,35 @@ import UIKit
 struct DeviceScreenView: View {
     @Environment(\.playerTheme) private var theme
     @EnvironmentObject private var navigation: PlayerNavigationModel
+    @EnvironmentObject private var playback: PlaybackController
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             screenBackground
 
-            VStack(spacing: 4) {
-                HStack(spacing: 6) {
-                    Text(title)
-                        .font(theme.screenFont(size: 18, weight: .bold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                    Spacer()
-                    BatteryStatusView()
-                }
-                .foregroundColor(theme.primaryText)
-                .shadow(color: .black, radius: 1, x: 1, y: 1)
-
+            if hidesChromeForVideo {
                 screenBody
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            } else {
+                VStack(spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text(title)
+                            .font(theme.screenFont(size: 18, weight: .bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                        Spacer()
+                        BatteryStatusView()
+                    }
+                    .foregroundColor(theme.primaryText)
+                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+
+                    screenBody
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 7)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 7)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         .overlay {
@@ -35,6 +41,10 @@ struct DeviceScreenView: View {
                 .stroke(Color.black.opacity(0.72), lineWidth: 2)
         }
         .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
+    }
+
+    private var hidesChromeForVideo: Bool {
+        navigation.currentScreen == .nowPlaying && playback.currentItem?.kind == .video
     }
 
     @ViewBuilder
@@ -107,6 +117,7 @@ struct DeviceScreenView: View {
 private struct BatteryStatusView: View {
     @Environment(\.playerTheme) private var theme
     @State private var levelText: String?
+    private let batteryTimer = Timer.publish(every: 20, on: .main, in: .common).autoconnect()
 
     var body: some View {
         HStack(spacing: 4) {
@@ -125,10 +136,23 @@ private struct BatteryStatusView: View {
             }
         }
         .onAppear {
-            UIDevice.current.isBatteryMonitoringEnabled = true
-            let level = UIDevice.current.batteryLevel
-            levelText = level >= 0 ? "\(Int((level * 100).rounded()))%" : nil
+            updateBatteryLevel()
         }
+        .onReceive(batteryTimer) { _ in
+            updateBatteryLevel()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.batteryLevelDidChangeNotification)) { _ in
+            updateBatteryLevel()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.batteryStateDidChangeNotification)) { _ in
+            updateBatteryLevel()
+        }
+    }
+
+    private func updateBatteryLevel() {
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        let level = UIDevice.current.batteryLevel
+        levelText = level >= 0 ? "\(Int((level * 100).rounded()))%" : nil
     }
 }
 

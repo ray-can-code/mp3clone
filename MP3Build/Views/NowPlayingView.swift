@@ -8,6 +8,8 @@ struct NowPlayingView: View {
     @EnvironmentObject private var playback: PlaybackController
 
     @State private var showingFullScreenVideo = false
+    @State private var titleVisible = true
+    @State private var titleHideToken = UUID()
 
     var body: some View {
         Group {
@@ -49,8 +51,16 @@ struct NowPlayingView: View {
                 .padding(.horizontal, 8)
                 .padding(.vertical, 5)
                 .background(Color.black.opacity(0.42))
+                .opacity(titleVisible ? 1 : 0)
+                .animation(.easeInOut(duration: 0.45), value: titleVisible)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            showTitleBriefly()
+        }
+        .onChange(of: item.id) { _ in
+            showTitleBriefly()
+        }
     }
 
     private func audioBody(for item: MediaItem) -> some View {
@@ -144,6 +154,16 @@ struct NowPlayingView: View {
     private func saveResumePositionIfNeeded() {
         guard let item = playback.currentItem, item.kind == .video else { return }
         try? library.setResumePosition(playback.currentTime, for: item)
+    }
+
+    private func showTitleBriefly() {
+        let token = UUID()
+        titleHideToken = token
+        titleVisible = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            guard titleHideToken == token else { return }
+            titleVisible = false
+        }
     }
 
     private func format(_ seconds: TimeInterval) -> String {

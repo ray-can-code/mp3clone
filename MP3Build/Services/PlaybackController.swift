@@ -24,6 +24,10 @@ final class PlaybackController: ObservableObject {
     private var queue: [(item: MediaItem, fileURL: URL)] = []
     private var queueIndex: Int = 0
 
+    init() {
+        configureRemoteCommands()
+    }
+
     func play(
         item: MediaItem,
         fileURL: URL,
@@ -44,6 +48,8 @@ final class PlaybackController: ObservableObject {
         removeEndObserver()
         currentItem = entry.item
         player = AVPlayer(url: entry.fileURL)
+        player?.allowsExternalPlayback = true
+        player?.audiovisualBackgroundPlaybackPolicy = .continuesIfPossible
         duration = player?.currentItem?.asset.duration.seconds.finiteOrZero ?? 0
         currentTime = max(0, resumeAt)
         addTimeObserver()
@@ -108,10 +114,43 @@ final class PlaybackController: ObservableObject {
 
     private func configureAudioSession() {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay])
+            try session.setActive(true, options: [])
         } catch {
             state = .failed("Audio session failed")
+        }
+    }
+
+    private func configureRemoteCommands() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.playCommand.addTarget { [weak self] _ in
+            Task { @MainActor in
+                if self?.state == .paused {
+                    self?.togglePlayPause()
+                }
+            }
+            return .success
+        }
+
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.pauseCommand.addTarget { [weak self] _ in
+            Task { @MainActor in
+                if self?.state == .playing {
+                    self?.togglePlayPause()
+                }
+            }
+            return .success
+        }
+
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+            Task { @MainActor in
+                self?.playNextFromQueue()
+            }
+            return .success
         }
     }
 

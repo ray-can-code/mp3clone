@@ -34,6 +34,7 @@
 		010000000000000000000019 /* ThemeManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000000000000000000001B /* ThemeManifestTests.swift */; };
 		01000000000000000000001A /* ClickWheelEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000000000000000000001C /* ClickWheelEngineTests.swift */; };
 		01000000000000000000001B /* MediaLibrarySortingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000000000000000000001D /* MediaLibrarySortingTests.swift */; };
+		01000000000000000000001C /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000000000000000000001E /* AppConfigurationTests.swift */; };
 		011000000000000000000001 /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000001 /* config.json */; };
 		011000000000000000000002 /* desk_bg001.png in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000002 /* desk_bg001.png */; };
 		011000000000000000000003 /* minecraft.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 021000000000000000000003 /* minecraft.ttf */; };
@@ -99,6 +100,7 @@
 		02000000000000000000001B /* ThemeManifestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManifestTests.swift; sourceTree = "<group>"; };
 		02000000000000000000001C /* ClickWheelEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickWheelEngineTests.swift; sourceTree = "<group>"; };
 		02000000000000000000001D /* MediaLibrarySortingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaLibrarySortingTests.swift; sourceTree = "<group>"; };
+		02000000000000000000001E /* AppConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationTests.swift; sourceTree = "<group>"; };
 		021000000000000000000001 /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
 		021000000000000000000002 /* desk_bg001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = desk_bg001.png; sourceTree = "<group>"; };
 		021000000000000000000003 /* minecraft.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = minecraft.ttf; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 				02000000000000000000001B /* ThemeManifestTests.swift */,
 				02000000000000000000001C /* ClickWheelEngineTests.swift */,
 				02000000000000000000001D /* MediaLibrarySortingTests.swift */,
+				02000000000000000000001E /* AppConfigurationTests.swift */,
 			);
 			path = MP3BuildTests;
 			sourceTree = "<group>";
@@ -398,6 +401,7 @@
 				010000000000000000000019 /* ThemeManifestTests.swift in Sources */,
 				01000000000000000000001A /* ClickWheelEngineTests.swift in Sources */,
 				01000000000000000000001B /* MediaLibrarySortingTests.swift in Sources */,
+				01000000000000000000001C /* AppConfigurationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
